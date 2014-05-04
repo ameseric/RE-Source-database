@@ -1,4 +1,25 @@
 
+/*  Database drop/add is not supported at the SQL level for phpmyadmin, so for our use,
+    first go into phpmyadmin localhost, then select the desired database, and run these
+    SQL commands. Everything is nominal, except that the queries reference no specific
+    database, so you need to select it manually via the GUI interface.
+    
+    NOTE: After running, phpmyadmin might not throw an error OR a success window.
+     Instead, it just points out that the DROP TABLE queries failed- BUT the rest
+     of the query still worked, so all tables have been created as needed.
+ */
+
+
+/* Again, can't wipe the database, so wipe every associated table.  */
+DROP TABLE IF EXISTS comment;
+DROP TABLE IF EXISTS file;
+DROP TABLE IF EXISTS class;
+DROP TABLE IF EXISTS student;
+DROP TABLE IF EXISTS admin;
+
+
+
+/* Recreate tables using queries.  */
 
 CREATE TABLE `admin` (
  `UID` int(8) NOT NULL AUTO_INCREMENT,
@@ -13,6 +34,18 @@ CREATE TABLE `admin` (
 
 
 
+CREATE TABLE `student` (
+ `UID` int(8) NOT NULL AUTO_INCREMENT,
+ `Username` varchar(30) NOT NULL,
+ `Password` varchar(30) NOT NULL,
+ `Name` varchar(30) NOT NULL,
+ `Blocked` int(1) NOT NULL DEFAULT '0',
+ `Year` varchar(4) DEFAULT NULL,
+ `Major` varchar(4) DEFAULT NULL,
+ PRIMARY KEY (`UID`)
+) ENGINE=InnoDB AUTO_INCREMENT=80000000 DEFAULT CHARSET=latin1;
+
+
 
 CREATE TABLE `class` (
  `Course_number` varchar(30) NOT NULL,
@@ -24,6 +57,20 @@ CREATE TABLE `class` (
  CONSTRAINT `class_ibfk_1` FOREIGN KEY (`Instructor`) REFERENCES `admin` (`UID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+
+
+
+CREATE TABLE `file` (
+ `FID` int(8) NOT NULL AUTO_INCREMENT,
+ `Timestamp` datetime DEFAULT NULL,
+ `Type` varchar(8) NOT NULL,
+ `Year` varchar(8) NOT NULL,
+ `Course_number` varchar(20) NOT NULL,
+ `UID` int(11) DEFAULT NULL,
+ PRIMARY KEY (`FID`),
+ KEY `UID` (`UID`),
+ CONSTRAINT `file_ibfk_1` FOREIGN KEY (`UID`) REFERENCES `student` (`UID`)
+) ENGINE=InnoDB AUTO_INCREMENT=60000000 DEFAULT CHARSET=latin1;
 
 
 
@@ -44,28 +91,25 @@ CREATE TABLE `comment` (
 ) ENGINE=InnoDB AUTO_INCREMENT=70000000 DEFAULT CHARSET=latin1;
 
 
-
-CREATE TABLE `file` (
- `FID` int(8) NOT NULL AUTO_INCREMENT,
- `Timestamp` datetime DEFAULT NULL,
- `Type` varchar(8) NOT NULL,
- `Year` varchar(8) NOT NULL,
- `Course_number` varchar(20) NOT NULL,
- `UID` int(11) DEFAULT NULL,
- PRIMARY KEY (`FID`),
- KEY `UID` (`UID`),
- CONSTRAINT `file_ibfk_1` FOREIGN KEY (`UID`) REFERENCES `student` (`UID`)
-) ENGINE=InnoDB AUTO_INCREMENT=60000000 DEFAULT CHARSET=latin1;
+/* Stored Procedures will be added here later.  */
 
 
 
-CREATE TABLE `student` (
- `UID` int(8) NOT NULL AUTO_INCREMENT,
- `Username` varchar(30) NOT NULL,
- `Password` varchar(30) NOT NULL,
- `Name` varchar(30) NOT NULL,
- `Blocked` int(1) NOT NULL DEFAULT '0',
- `Year` varchar(4) DEFAULT NULL,
- `Major` varchar(4) DEFAULT NULL,
- PRIMARY KEY (`UID`)
-) ENGINE=InnoDB AUTO_INCREMENT=80000000 DEFAULT CHARSET=latin1;
+
+
+
+/* Sample data is entered here....  */
+
+
+
+
+
+
+
+/*  Done!  */
+
+
+
+
+
+
