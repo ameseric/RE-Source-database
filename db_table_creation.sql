@@ -93,7 +93,90 @@ CREATE TABLE `comment` (
 
 /* Stored Procedures will be added here later.  */
 
-
+CREATE PROCEDURE CreateStudent
+	(@UID [int],
+	@Username [varchar(30)],
+	@Password [varchar(30)],
+	@Name [varchar(30)],
+	@Year [int],
+	@Major [varchar(4)],
+	@result smallint OUTPUT)
+AS
+IF(Exists (Select [Username] from [student] Where [Username] = @Username)
+	OR Exists (Select [Username] from [admin] Where [Username] = @Username))
+	Begin
+		Set @result = 1
+		RaisError('That username is already taken', 14, 1)
+		Return
+	End
+ELSE IF (Exists (Select [UID] from [student] Where [UID] = @UID))
+	Begin
+		Set @result = 1
+		RaisError('An account already exists for this ID number', 14, 1)
+		Return
+	End
+ELSE
+	Begin
+		INSERT INTO [student]
+			([UID], [Username], [Password], [Name], [Blocked], [Year], [Major])
+		VALUES (@UID, @Username, @Password, @Name, 0, @Year, @Major)
+	End
+	
+CREATE PROCEDURE CreateAdmin
+	(@UID [int],
+	@Username [varchar(30)],
+	@Password [varchar(30)],
+	@Name [varchar(30)],
+	@Department [varchar(30)],
+	@result smallint OUTPUT)
+AS
+IF(Exists (Select [Username] from [student] Where [Username] = @Username)
+	OR Exists (Select [Username] from [admin] Where [Username] = @Username))
+	Begin
+		Set @result = 1
+		RaisError('That username is already taken', 14, 1)
+		Return
+	End
+ELSE IF (Exists (Select [UID] from [admin] Where [UID] = @UID))
+	Begin
+		Set @result = 1
+		RaisError('An account already exists for this ID number', 14, 1)
+		Return
+	End
+ELSE
+	Begin
+		INSERT INTO [student]
+			([UID], [Username], [Password], [Name], [Blocked], [Permissions], [Department])
+		VALUES (@UID, @Username, @Password, @Name, 0, 1, @Deparment)
+	End
+	
+CREATE PROCEDURE CreateAdmin
+	(@UID [int],
+	@Username [varchar(30)],
+	@Password [varchar(30)],
+	@Name [varchar(30)],
+	@Department [varchar(30)],
+	@result smallint OUTPUT)
+AS
+IF(Exists (Select [Username] from [student] Where [Username] = @Username)
+	OR Exists (Select [Username] from [admin] Where [Username] = @Username))
+	Begin
+		Set @result = 1
+		RaisError('That username is already taken', 14, 1)
+		Return
+	End
+ELSE IF (Exists (Select [UID] from [admin] Where [UID] = @UID))
+	Begin
+		Set @result = 1
+		RaisError('An account already exists for this ID number', 14, 1)
+		Return
+	End
+ELSE
+	Begin
+		INSERT INTO [student]
+			([UID], [Username], [Password], [Name], [Blocked], [Permissions], [Department])
+		VALUES (@UID, @Username, @Password, @Name, 0, 1, @Deparment)
+	End
 
 
 
