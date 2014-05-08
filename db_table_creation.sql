@@ -94,88 +94,84 @@ CREATE TABLE `comment` (
 /* Stored Procedures will be added here later.  */
 
 CREATE PROCEDURE CreateStudent
-	(@UID [int],
-	@Username [varchar(30)],
-	@Password [varchar(30)],
-	@Name [varchar(30)],
-	@Year [int],
-	@Major [varchar(4)],
-	@result smallint OUTPUT)
+	(IN uid int,
+	IN username varchar(30),
+	IN password varchar(30),
+	IN name varchar(30),
+	IN year int,
+	IN major varchar(4),
+	OUT result smallint)
 AS
-IF(Exists (Select [Username] from [student] Where [Username] = @Username)
-	OR Exists (Select [Username] from [admin] Where [Username] = @Username))
+IF(Exists (Select Username from student Where Username = username)
+	OR Exists (Select Username from admin Where Username = username))
 	Begin
-		Set @result = 1
-		RaisError('That username is already taken', 14, 1)
+		Set result = 1;
+		RaisError('That username is already taken', 14, 1);
 		Return
 	End
-ELSE IF (Exists (Select [UID] from [student] Where [UID] = @UID))
+ELSE IF (Exists (Select UID from student Where UID = uid))
 	Begin
-		Set @result = 1
-		RaisError('An account already exists for this ID number', 14, 1)
+		Set result = 1;
+		RaisError('An account already exists for this ID number', 14, 1);
 		Return
 	End
 ELSE
 	Begin
-		INSERT INTO [student]
-			([UID], [Username], [Password], [Name], [Blocked], [Year], [Major])
-		VALUES (@UID, @Username, @Password, @Name, 0, @Year, @Major)
+		INSERT INTO student
+			(UID, Username, Password, Name, Blocked, Year, Major)
+		VALUES (uid, username, password, name, 0, year, major);
 	End
 	
 CREATE PROCEDURE CreateAdmin
-	(@UID [int],
-	@Username [varchar(30)],
-	@Password [varchar(30)],
-	@Name [varchar(30)],
-	@Department [varchar(30)],
-	@result smallint OUTPUT)
+	(IN uid int,
+	IN username varchar(30),
+	IN password varchar(30),
+	IN name varchar(30),
+	IN department varchar(30),
+	OUT result smallint)
 AS
-IF(Exists (Select [Username] from [student] Where [Username] = @Username)
-	OR Exists (Select [Username] from [admin] Where [Username] = @Username))
+IF(Exists (Select Username from student Where Username = username)
+	OR Exists (Select Username from admin Where Username = username))
 	Begin
-		Set @result = 1
-		RaisError('That username is already taken', 14, 1)
+		Set result = 1;
+		RaisError('That username is already taken', 14, 1);
 		Return
 	End
-ELSE IF (Exists (Select [UID] from [admin] Where [UID] = @UID))
+ELSE IF (Exists (Select UID from admin Where UID = uid))
 	Begin
-		Set @result = 1
-		RaisError('An account already exists for this ID number', 14, 1)
+		Set result = 1;
+		RaisError('An account already exists for this ID number', 14, 1);
 		Return
 	End
 ELSE
 	Begin
-		INSERT INTO [student]
-			([UID], [Username], [Password], [Name], [Blocked], [Permissions], [Department])
-		VALUES (@UID, @Username, @Password, @Name, 0, 1, @Deparment)
+		INSERT INTO student
+			(UID, Username, Password, Name, Blocked, Permissions, Department)
+		VALUES (uid, username, password, name, 0, 1, department);
 	End
 	
-CREATE PROCEDURE CreateAdmin
-	(@UID [int],
-	@Username [varchar(30)],
-	@Password [varchar(30)],
-	@Name [varchar(30)],
-	@Department [varchar(30)],
-	@result smallint OUTPUT)
+CREATE PROCEDURE UpdateBlocked
+	(IN uid int,
+	IN blocked int,
+	OUT result smallint)
 AS
-IF(Exists (Select [Username] from [student] Where [Username] = @Username)
-	OR Exists (Select [Username] from [admin] Where [Username] = @Username))
+IF(Exists (Select UID from student Where UID = uid))
 	Begin
-		Set @result = 1
-		RaisError('That username is already taken', 14, 1)
-		Return
+		Update student
+		Set Blocked = blocked
+		Where UID = uid;
 	End
-ELSE IF (Exists (Select [UID] from [admin] Where [UID] = @UID))
+ELSE IF (Exists (Select UID from admin Where UID = uid))
 	Begin
-		Set @result = 1
-		RaisError('An account already exists for this ID number', 14, 1)
-		Return
+		Update admin
+		Set Blocked = blocked
+		Where UID = uid;
 	End
 ELSE
 	Begin
-		INSERT INTO [student]
-			([UID], [Username], [Password], [Name], [Blocked], [Permissions], [Department])
-		VALUES (@UID, @Username, @Password, @Name, 0, 1, @Deparment)
+		Set result = 1;
+		RaisError('UID not found', 14, 1);
+		Return
 	End
 
 
