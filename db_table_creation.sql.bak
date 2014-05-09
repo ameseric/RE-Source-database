@@ -9,7 +9,6 @@
      of the query still worked, so all tables have been created as needed.
  */
 
-Come on, make the changes...
 
 /* Again, can't wipe the database, so wipe every associated table.  */
 DROP TABLE IF EXISTS comment;
@@ -81,7 +80,92 @@ CREATE TABLE `comment` (
 ) ENGINE=InnoDB AUTO_INCREMENT=70000000 DEFAULT CHARSET=latin1;
 
 
+<<<<<<< HEAD
 /*====================== Stored Procedures here. ========================= */
+=======
+/* Stored Procedures will be added here later.  */
+
+CREATE PROCEDURE CreateStudent
+	(IN uid int,
+	IN username varchar(30),
+	IN password varchar(30),
+	IN name varchar(30),
+	IN year int,
+	IN major varchar(4),
+	OUT result smallint)
+AS
+IF(Exists (Select Username from student Where Username = username)
+	OR Exists (Select Username from admin Where Username = username))
+	Begin
+		Set result = 1;
+		RaisError('That username is already taken', 14, 1);
+		Return
+	End
+ELSE IF (Exists (Select UID from student Where UID = uid))
+	Begin
+		Set result = 1;
+		RaisError('An account already exists for this ID number', 14, 1);
+		Return
+	End
+ELSE
+	Begin
+		INSERT INTO student
+			(UID, Username, Password, Name, Blocked, Year, Major)
+		VALUES (uid, username, password, name, 0, year, major);
+	End
+	
+CREATE PROCEDURE CreateAdmin
+	(IN uid int,
+	IN username varchar(30),
+	IN password varchar(30),
+	IN name varchar(30),
+	IN department varchar(30),
+	OUT result smallint)
+AS
+IF(Exists (Select Username from student Where Username = username)
+	OR Exists (Select Username from admin Where Username = username))
+	Begin
+		Set result = 1;
+		RaisError('That username is already taken', 14, 1);
+		Return
+	End
+ELSE IF (Exists (Select UID from admin Where UID = uid))
+	Begin
+		Set result = 1;
+		RaisError('An account already exists for this ID number', 14, 1);
+		Return
+	End
+ELSE
+	Begin
+		INSERT INTO student
+			(UID, Username, Password, Name, Blocked, Permissions, Department)
+		VALUES (uid, username, password, name, 0, 1, department);
+	End
+	
+CREATE PROCEDURE UpdateBlocked
+	(IN uid int,
+	IN blocked int,
+	OUT result smallint)
+AS
+IF(Exists (Select UID from student Where UID = uid))
+	Begin
+		Update student
+		Set Blocked = blocked
+		Where UID = uid;
+	End
+ELSE IF (Exists (Select UID from admin Where UID = uid))
+	Begin
+		Update admin
+		Set Blocked = blocked
+		Where UID = uid;
+	End
+ELSE
+	Begin
+		Set result = 1;
+		RaisError('UID not found', 14, 1);
+		Return
+	End
+>>>>>>> bf8a5a80d522ce44a2d097a9c321e610d7362a3d
 
 
 DROP PROCEDURE IF EXISTS CreateUser;
