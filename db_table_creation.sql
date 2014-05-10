@@ -22,9 +22,9 @@ DROP TABLE IF EXISTS users;
 /* ======== Recreate tables using queries. ================*/
 
 CREATE TABLE `users` (
- `UID` int(8) NOT NULL AUTO_INCREMENT,
+ `UID` int(8) NOT NULL,
  `Username` varchar(30) NOT NULL,
- `Password` varchar(30) NOT NULL,
+ `HashPassword` varchar(32) NOT NULL,
  `Name` varchar(30) NOT NULL,
  `Blocked` int(1) NOT NULL,
  `Permissions` int(1) NOT NULL,
@@ -32,7 +32,7 @@ CREATE TABLE `users` (
  `Year` int(4),
  `Major` varchar(3),
  PRIMARY KEY (`UID`)
-) ENGINE=InnoDB AUTO_INCREMENT=80000000 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 
@@ -89,7 +89,9 @@ DROP PROCEDURE IF EXISTS UpdateBlocked;
 DROP PROCEDURE IF EXISTS UpdatePermissions;
 DROP PROCEDURE IF EXISTS CreateComment;
 DROP PROCEDURE IF EXISTS UploadFile;
-
+DROP PROCEDURE IF EXISTS DeleteFile;
+DROP PROCEDURE IF EXISTS DeleteComment;
+DROP PROCEDURE IF EXISTS DeleteUser;
 
 
 CREATE PROCEDURE CreateUser
@@ -191,6 +193,11 @@ MAIN:BEGIN
         SELECT 'Improper file type, please try again.';
         LEAVE MAIN;
     END IF;
+    
+    IF ( (SELECT Blocked FROM users WHERE UID=_uid) = 1) THEN
+        SELECT 'User is BLOCKED, not allowed to upload files.';
+        LEAVE MAIN;
+    END IF;
 
     IF EXISTS (SELECT UID from users WHERE UID=_uid) /*Check for user existance*/
         THEN
@@ -209,29 +216,105 @@ CREATE PROCEDURE CreateComment
     IN _uid int(9),
     IN _comment int(9)
     )
-BEGIN
+MAIN:BEGIN
     IF _comment = '' THEN
         SET _comment = NULL;
     END IF;
+    
+    IF ((SELECT Blocked FROM users WHERE UID=_uid) = 1) THEN
+        SELECT 'User is blocked- action not allowed.';
+        LEAVE MAIN;
+    END IF;
 
     INSERT INTO comment (Body, Timestamp, FID, UID, Reply_to)
-    VALUES(_text, CURRENT_DATETIME, _fid, _uid, _comment);
+    VALUES(_text, CURRENT_TIMESTAMP, _fid, _uid, _comment);
 
 END $$
 
 
+
+CREATE PROCEDURE DeleteComment
+    (IN _uid int(8),
+    IN _cid int(8)
+    )
+MAIN:BEGIN
+    IF ( (SELECT UID FROM comment WHERE CID=_cid) <> _uid) OR ((SELECT Permissions FROM users WHERE UID=_uid) < 2)
+        THEN
+            SELECT 'You are neither the user who posted this comment, or an admin. Action not allowed.';
+            LEAVE MAIN;
+    END IF;
+    
+    IF EXISTS (SELECT CID from comment WHERE CID=_cid) THEN
+        DELETE FROM comment WHERE CID=_cid;
+        SELECT 'Comment deleted.';
+        LEAVE MAIN;
+    END IF;
+    
+    SELECT 'Comment does not exist.';
+    
+END $$
+
+
+
+
+CREATE PROCEDURE DeleteFile
+    (IN _uid int(8),
+    IN _fid int(8)
+    )
+MAIN:BEGIN
+    IF ( (SELECT UID FROM file WHERE FID=_fid) <> _uid) OR ((SELECT Permissions FROM users WHERE UID=_uid) < 2)
+        THEN
+            SELECT 'You are neither the user who posted this file, or an admin. Action not allowed.';
+            LEAVE MAIN;
+    END IF;
+    
+    IF EXISTS (SELECT FID from file WHERE FID=_fid) THEN
+        DELETE FROM comment WHERE FID=_fid; /* To satisfy any attached comments */
+        DELETE FROM file WHERE FID=_fid;
+        SELECT 'File deleted';
+        LEAVE MAIN;
+    END IF;
+    
+    SELECT 'File does not exist.';
+    
+END $$
+
+
+CREATE PROCEDURE DeleteUser
+    (IN _uid int(8),
+    IN del_uid int(8)
+    )
+MAIN:BEGIN
+    IF ( (_uid <> del_uid) OR (SELECT Permissions FROM users WHERE UID=_uid) < 2)
+        THEN
+            SELECT 'You are neither the user who posted this file, or an admin. Action not allowed.';
+            LEAVE MAIN;
+    END IF;
+    
+    UPDATE comment SET UID=00000000 WHERE UID=del_uid;
+    UPDATE file SET UID=00000000 WHERE UID=del_uid;
+    DELETE FROM users WHERE UID=del_uid;
+    
+END $$
 
 
 
 
 /* Sample data is entered here....  */
 
-
+CALL CreateUser(00000000, 'Nihil', 'Void', 'Nihil', '', '', '', @result);
 CALL CreateUser(12345678, 'Admin01', 'god', 'Carl', NULL, NULL, '', @result);
+CALL CreateUser(80000010, 'Blocky', 'idiot', 'Joe', '', '', '', @result);
 CALL UpdatePermissions(12345678, 2, @result);
+CALL UpdateBlocked(80000010, 1, @result);
 CALL UploadFile(12345678, 'Exam', 2013, 'CSSE_415');
-/* CALL CreateComment('Hey, how are you?', ); */
 
+CALL CreateComment('I AM GOD.', 60000000, 12345678, '');
+CALL DeleteComment(12341234, 1);
+CALL DeleteComment(12345678, 1);
+
+CALL DeleteFile(12341234, 60000000);
+CALL DeleteFile(12345678, 60000000);
 
 
 
