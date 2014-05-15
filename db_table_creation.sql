@@ -189,7 +189,10 @@ CREATE PROCEDURE UploadFile
     (IN _uid int(9),
      IN _Type varchar(9),
      IN _Year int(4),
-     IN _Course_num varchar(20)
+     IN _Course_num varchar(20),
+     IN _content mediumblob,
+     IN _name varchar(32),
+     IN _instr varchar(50)
      )
 MAIN:BEGIN
     IF (_Type <> 'Exam' AND _Type <> 'Quiz' AND _Type <> 'Homework' AND _Type <> 'Other') THEN
@@ -204,8 +207,8 @@ MAIN:BEGIN
 
     IF EXISTS (SELECT UID from users WHERE UID=_uid) /*Check for user existance*/
         THEN
-            INSERT INTO file (Timestamp, Type, Year, Course_number, UID)
-            VALUES(CURRENT_TIMESTAMP, _Type, _Year, _Course_num, _uid);
+            INSERT INTO file (Timestamp, Type, Year, Course_number, UID, Content, Name, Instructor)
+            VALUES(CURRENT_TIMESTAMP, _Type, _Year, _Course_num, _uid, _content, _name, _instr);
             LEAVE MAIN;
     END IF;
     Select 'User does not exist.';
