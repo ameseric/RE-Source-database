@@ -52,12 +52,14 @@ CREATE TABLE `class` (
 
 CREATE TABLE `file` (
  `FID` int(8) NOT NULL AUTO_INCREMENT,
- `Name` varchar(30) NOT NULL,
- `Timestamp` datetime DEFAULT NULL,
+ `Content` mediumblob NOT NULL,
+ `Timestamp` int(11) NOT NULL,
  `Type` varchar(8) NOT NULL,
  `Year` varchar(8) NOT NULL,
  `Course_number` varchar(20) NOT NULL,
  `UID` int(11) DEFAULT NULL,
+ `Name` varchar(30) NOT NULL,
+ `Instructor` varchar(50) NULL,
  PRIMARY KEY (`FID`),
  KEY `UID` (`UID`),
  CONSTRAINT `file_ibfk_1` FOREIGN KEY (`UID`) REFERENCES `users` (`UID`)
