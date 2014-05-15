@@ -136,7 +136,7 @@ MAIN:BEGIN
         LEAVE MAIN;
     END IF;
 
-    INSERT INTO users (UID, Username, Password, Name, Blocked, Permissions, Department, Year, Major)
+    INSERT INTO users (UID, Username, HashPassword, Name, Blocked, Permissions, Department, Year, Major)
     VALUES(uid_0, username_1, password_2, name_3, 0, 0, department_4, year_5, major_6);
 
 END $$
