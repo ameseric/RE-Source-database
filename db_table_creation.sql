@@ -52,6 +52,7 @@ CREATE TABLE `class` (
 
 CREATE TABLE `file` (
  `FID` int(8) NOT NULL AUTO_INCREMENT,
+ `Name` varchar(30) NOT NULL,
  `Timestamp` datetime DEFAULT NULL,
  `Type` varchar(8) NOT NULL,
  `Year` varchar(8) NOT NULL,
