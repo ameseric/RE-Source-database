@@ -140,7 +140,7 @@ MAIN:BEGIN
     END IF;
 
     INSERT INTO users (UID, Username, HashPassword, Name, Blocked, Permissions, Department, Year, Major)
-    VALUES(uid_0, username_1, password_2, name_3, 0, 0, department_4, year_5, major_6);
+    VALUES(uid_0, username_1, MD5(password_2), name_3, 0, 0, department_4, year_5, major_6);
 
 END $$
 
@@ -183,7 +183,7 @@ MAIN:BEGIN
 END $$
 
 
-/* TODO: Ask about name field for File, and Derek about auto-grabbing UID from user*/
+//=======================No longer applicable======================
 
 CREATE PROCEDURE UploadFile
     (IN _uid int(9),
@@ -214,6 +214,9 @@ MAIN:BEGIN
     Select 'User does not exist.';
     
 END $$
+
+
+//==========================================================
      
 
 CREATE PROCEDURE CreateComment
@@ -313,14 +316,8 @@ CALL CreateUser(12345678, 'Admin01', 'god', 'Carl', NULL, NULL, '', @result);
 CALL CreateUser(80000010, 'Blocky', 'idiot', 'Joe', '', '', '', @result);
 CALL UpdatePermissions(12345678, 2, @result);
 CALL UpdateBlocked(80000010, 1, @result);
-CALL UploadFile(12345678, 'Exam', 2013, 'CSSE_415');
 
 CALL CreateComment('I AM GOD.', 60000000, 12345678, '');
-CALL DeleteComment(12341234, 1);
-CALL DeleteComment(12345678, 1);
-
-CALL DeleteFile(12341234, 60000000);
-CALL DeleteFile(12345678, 60000000);
 
 
 
