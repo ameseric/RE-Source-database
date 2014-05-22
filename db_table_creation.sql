@@ -145,37 +145,40 @@ END $$
     
     
 CREATE PROCEDURE UpdateBlocked
-    (IN _uid int,
+    (IN self_uid int,
+    IN target_uid int,
     IN _blocked int,
     OUT result smallint)
 MAIN:BEGIN
 
-    IF(Exists (Select UID from users Where UID = _uid)) THEN
-        Update users SET Blocked = _blocked WHERE UID=_uid;
+    IF(Exists (Select UID from users Where UID = target_uid)) AND
+                    ( (SELECT Permissions from users Where UID=self_uid) >= 2) THEN
+        Update users SET Blocked = _blocked WHERE UID=target_uid;
         LEAVE MAIN;
     END IF;
 
     Set result = 1;
-    SELECT 'UID not found! Please try again.';
+    SELECT 'UID not found or Permissions inadequate! Please try again.';
 
 END $$
 
 
 
 CREATE PROCEDURE UpdatePermissions
-    (IN uid_1 int,
+    (IN self_uid int,
+    IN target_uid int,
     IN new_perm int,
     OUT result smallint)
 MAIN:BEGIN
 
-    IF(Exists (Select UID from users Where UID = uid_1))
-        THEN
-            UPDATE users SET Permissions = new_perm WHERE UID = uid_1;
+    IF(Exists (Select UID from users Where UID = target_uid)) AND
+                    ( (SELECT Permissions from users Where UID=self_uid) >= 2) THEN
+            UPDATE users SET Permissions = new_perm WHERE UID = target_uid;
             LEAVE MAIN;
     END IF;
 
     Set result = 1;
-    SELECT 'UID not found! Please try again.';
+    SELECT 'UID not found or Permissions inadequate! Please try again.';
 
 END $$
 
