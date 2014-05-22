@@ -41,10 +41,17 @@ CREATE TABLE `class` (
  `Course_number` varchar(30) NOT NULL,
  `Department` varchar(30) DEFAULT NULL,
  `CName` varchar(50) DEFAULT NULL,
- PRIMARY KEY (`Course_number`),
+ PRIMARY KEY (`Course_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
+CREATE TABLE `alter` (
+`Timestamp` datetime NOT NULL,
+`UID` int(9) NOT NULL,
+`Table` varchar(6) NOT NULL,
+`Body` varchar(25) NOT NULL,
+PRIMARY KEY (`Timestamp`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 CREATE TABLE `file` (
