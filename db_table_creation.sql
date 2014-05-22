@@ -41,10 +41,7 @@ CREATE TABLE `class` (
  `Course_number` varchar(30) NOT NULL,
  `Department` varchar(30) DEFAULT NULL,
  `CName` varchar(50) DEFAULT NULL,
- `Instructor` int(8) NOT NULL,
  PRIMARY KEY (`Course_number`),
- KEY `Instructor` (`Instructor`),
- CONSTRAINT `class_ibfk_1` FOREIGN KEY (`Instructor`) REFERENCES `users` (`UID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
